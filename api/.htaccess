@@ -1,0 +1,4 @@
+# Helpers and dot-files are never served directly.
+<FilesMatch "^(_|\.)">
+  Require all denied
+</FilesMatch>

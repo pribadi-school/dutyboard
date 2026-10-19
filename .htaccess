@@ -1,0 +1,39 @@
+# Teachers on Duty — Apache config for cPanel (copied to the site root by deploy.sh).
+# Only the app is served: index.html, built assets, icons and api/*.php.
+# Everything else that exists on disk is a 404; any other path is a page of
+# the single-page app (index.html).
+
+Options -Indexes
+DirectoryIndex index.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  RewriteRule ^(index\.html|assets/[A-Za-z0-9._-]+|api/[a-z]+\.php|favicon\.ico|icon-32\.png|apple-touch-icon\.png|pribadi-red\.png)$ - [L]
+
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteCond %{REQUEST_URI} !^/$
+  RewriteRule ^ - [R=404,L]
+
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# Dot-files, PHP helpers and SQL are never served, even if rewriting is off.
+<FilesMatch "^(\.|_)|\.(sql|md|sh|ts|json|yml|ini|log)$">
+  Require all denied
+</FilesMatch>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "same-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  # Built files have a hash in their name: cache them for a year. The page itself: always check.
+  <FilesMatch "\.(js|css|woff2?)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "^index\.html$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
