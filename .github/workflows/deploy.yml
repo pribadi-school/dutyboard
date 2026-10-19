@@ -1,0 +1,34 @@
+# Every push to main: test, build and push the result to the `deploy` branch
+# (same as running `npm run deploy`). Then, to put it live, in
+# cPanel → Terminal: cd ~/repositories/duty-board && git pull && bash deploy.sh
+# No secrets are needed here: DB credentials live only in ~/duty-config.php on the server.
+name: Build for cPanel
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# One build at a time, so deploy-branch pushes never race.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - run: npm run deploy

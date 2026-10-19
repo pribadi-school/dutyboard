@@ -1,0 +1,9 @@
+node_modules
+dist
+.env
+.env.local
+*.log
+.claude
+# Server credentials never belong in the repo
+duty-config.php
+duty-config.local.php

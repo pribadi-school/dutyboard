@@ -1,0 +1,173 @@
+/*
+ * Design tokens — single source of truth:
+ *   design-system/sekolah-pribadi-depok/MASTER.md
+ * App-specific additions (duty status colours, live indicator, AA-safe action
+ * blue) are documented in
+ *   design-system/sekolah-pribadi-depok/pages/duty-board.md
+ * Every colour below traces to a MASTER palette role. No stray hex values.
+ */
+@import 'tailwindcss';
+
+@theme {
+  /* Remove Tailwind's default palette so only brand colours exist. */
+  --color-*: initial;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* ---- MASTER.md palette ---- */
+  --color-primary: #18a8fa;
+  --color-primary-dark: #0d8fdb;
+  --color-gradient-start: #0172bb;
+  --color-gradient-end: #01a6a1;
+  --color-gradient-start-on-dark: #2bb6ff;
+  --color-gradient-end-on-dark: #4fe0da;
+  --color-accent: #f26522;
+  --color-on-primary: #ffffff;
+  --color-foreground: #12233c;
+  --color-foreground-alt: #1c2733;
+  --color-muted-foreground: #5a6472;
+  --color-surface: #ffffff;
+  --color-surface-page: #f2f5f9;
+  --color-surface-muted: #e9eef5;
+  --color-border: rgba(18, 35, 60, 0.08);
+  --color-dark-surface: #0a0a0c;
+  --color-destructive: #dc2626;
+  --color-white: #ffffff;
+
+  /* ---- App extensions (derived from the palette above) ---- */
+  /* White text on #18a8fa is 2.62:1 (fails WCAG AA). Interactive fills and
+     blue text therefore use gradient-start (#0172bb, 5.09:1 with white). */
+  --color-action: var(--color-gradient-start);
+  --color-action-hover: color-mix(in srgb, var(--color-gradient-start) 80%, var(--color-foreground));
+  --color-action-tint: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
+  --color-border-strong: rgba(18, 35, 60, 0.16);
+  --color-overlay: rgba(18, 35, 60, 0.45);
+
+  /* Status colours (Now / Next / Done) */
+  --color-status-available-bg: var(--color-surface);
+  --color-status-available-fg: var(--color-gradient-start);
+  --color-status-available-border: color-mix(in srgb, var(--color-primary) 32%, var(--color-surface));
+  --color-status-taken-bg: var(--color-surface-muted);
+  --color-status-taken-fg: var(--color-muted-foreground);
+  --color-status-progress-bg: color-mix(in srgb, var(--color-gradient-end) 14%, var(--color-surface));
+  --color-status-progress-fg: var(--color-foreground);
+  --color-status-progress-dot: var(--color-gradient-end);
+  --color-status-done-bg: var(--color-surface-page);
+  --color-status-done-fg: var(--color-muted-foreground);
+  --color-live: var(--color-gradient-end);
+  --color-destructive-tint: color-mix(in srgb, var(--color-destructive) 8%, var(--color-surface));
+  --color-accent-tint: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface));
+
+  /* ---- Elevation: Flat Design (ui-ux-pro-max) ----
+     Surfaces are separated by 1px borders, not shadows. Only things that
+     float above the page (bottom sheets, toasts) keep one soft shadow. */
+  --shadow-e1: none;
+  --shadow-e2: none;
+  --shadow-e3: none;
+  --shadow-e4: 0 12px 32px -8px rgba(18, 35, 60, 0.22);
+
+  /* ---- Radius (flat: tight, consistent corners) ---- */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* ---- Motion ---- */
+  --ease-standard: ease;
+  --ease-out-cubic: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  --animate-shimmer: shimmer 1.4s linear infinite;
+  --animate-live-ping: live-ping 1.8s var(--ease-out-cubic) infinite;
+  --animate-sheet-up: sheet-up 240ms var(--ease-out-cubic);
+  --animate-fade-in: fade-in 180ms ease;
+  --animate-step-in: step-in 200ms var(--ease-out-cubic);
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+@keyframes live-ping {
+  0% { transform: scale(1); opacity: 0.6; }
+  80%, 100% { transform: scale(2.6); opacity: 0; }
+}
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes step-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-surface-page);
+    color: var(--color-foreground-alt);
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 {
+    color: var(--color-foreground);
+    letter-spacing: -0.01em;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-action);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  button:not(:disabled), [role='button']:not([aria-disabled='true']) {
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  /* Skeleton loader block */
+  .skeleton {
+    background: linear-gradient(90deg, var(--color-surface-muted) 25%, var(--color-surface-page) 50%, var(--color-surface-muted) 75%);
+    background-size: 200% 100%;
+    animation: var(--animate-shimmer);
+    border-radius: var(--radius-sm);
+  }
+  .check-draw {
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: draw 320ms 80ms var(--ease-out-cubic) forwards;
+  }
+  .pb-safe {
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+}
+
+/* MASTER.md: disable (not just shorten) motion for reduced-motion users. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .check-draw { stroke-dashoffset: 0; }
+}
+
+/* /print: one A4 landscape page, like the PDF on the notice board. */
+@page {
+  size: A4 landscape;
+  margin: 10mm;
+}
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

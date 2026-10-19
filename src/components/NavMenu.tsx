@@ -1,0 +1,115 @@
+/**
+ * Header menu (hamburger): the teachers' pages (week, TV board) and the
+ * office's (print, admin).
+ * Opens a panel under the header; closes on Esc, on a tap outside, or when a
+ * link is followed. The current page is marked.
+ */
+import { useEffect, useId, useRef, useState } from 'react';
+import { Link, useLocation } from 'react-router';
+import { CalendarDays, Menu, Printer, ShieldCheck, Tv, X } from 'lucide-react';
+import { useI18n, type MessageKey } from '../lib/i18n';
+import { cx } from './ui';
+
+const LINKS: { to: string; label: MessageKey; icon: typeof Tv; group: 'teachers' | 'staff' }[] = [
+  { to: '/week', label: 'nav_week', icon: CalendarDays, group: 'teachers' },
+  { to: '/', label: 'nav_tv', icon: Tv, group: 'teachers' },
+  { to: '/print', label: 'nav_print', icon: Printer, group: 'staff' },
+  { to: '/admin', label: 'nav_admin', icon: ShieldCheck, group: 'staff' },
+];
+
+export function NavMenu() {
+  const { t } = useI18n();
+  const { pathname } = useLocation();
+  const [open, setOpen] = useState(false);
+  const panelId = useId();
+  const root = useRef<HTMLDivElement>(null);
+  // Phones: a full-width panel right under the header. Wider screens: a
+  // dropdown anchored under the ☰ button.
+  const [phoneTop, setPhoneTop] = useState<number | null>(null);
+  const button = useRef<HTMLButtonElement>(null);
+
+  // Close when the page changes.
+  useEffect(() => setOpen(false), [pathname]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false);
+        button.current?.focus();
+      }
+    };
+    const onDown = (e: PointerEvent) => !root.current?.contains(e.target as Node) && setOpen(false);
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', onDown);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('pointerdown', onDown);
+    };
+  }, [open]);
+
+  const isCurrent = (to: string) => (to === '/' ? pathname === '/' : pathname.startsWith(to));
+
+  return (
+    <div ref={root} className="relative">
+      <button
+        ref={button}
+        type="button"
+        aria-label={t('nav_menu')}
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={() => {
+          const phone = !window.matchMedia('(min-width: 640px)').matches;
+          const header = root.current?.closest('header');
+          setPhoneTop(phone && header ? header.getBoundingClientRect().bottom : null);
+          setOpen((o) => !o);
+        }}
+        className={cx(
+          'inline-flex size-11 items-center justify-center rounded-md border transition-colors duration-150',
+          open ? 'border-action bg-action-tint text-action' : 'border-border-strong text-foreground hover:bg-surface-page',
+        )}
+      >
+        {open ? <X className="size-5" aria-hidden /> : <Menu className="size-5" aria-hidden />}
+      </button>
+      {open && (
+        <nav
+          id={panelId}
+          aria-label={t('nav_menu')}
+          style={phoneTop !== null ? { top: phoneTop } : undefined}
+          className={cx(
+            'z-50 bg-surface shadow-e4 animate-fade-in',
+            phoneTop !== null
+              ? 'fixed inset-x-0 max-h-[calc(100dvh-80px)] overflow-y-auto border-b border-border-strong'
+              : 'absolute top-full right-0 mt-2 w-72 rounded-lg border border-border-strong',
+          )}
+        >
+          {(['teachers', 'staff'] as const).map((group) => (
+            <div key={group} className="border-b border-border-strong px-2 py-2 last:border-b-0">
+              <p className="px-3 pt-1 pb-1.5 text-sm font-semibold text-muted-foreground">{t(group === 'teachers' ? 'nav_forTeachers' : 'nav_forStaff')}</p>
+              <ul>
+                {LINKS.filter((l) => l.group === group).map(({ to, label, icon: Icon }) => {
+                  const current = isCurrent(to);
+                  return (
+                    <li key={to}>
+                      <Link
+                        to={to}
+                        aria-current={current ? 'page' : undefined}
+                        className={cx(
+                          'flex min-h-12 items-center gap-3 rounded-md px-3 text-base font-semibold transition-colors duration-150',
+                          current ? 'bg-action-tint text-action' : 'text-foreground hover:bg-surface-page',
+                        )}
+                      >
+                        <Icon className={cx('size-5 shrink-0', current ? 'text-action' : 'text-muted-foreground')} aria-hidden />
+                        {t(label)}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+        </nav>
+      )}
+    </div>
+  );
+}
