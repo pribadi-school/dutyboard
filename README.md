@@ -115,18 +115,18 @@ in.
 6. **Code** — cPanel → Terminal:
 
    ```bash
-   git clone -b deploy https://github.com/pribadi-school/duty-board.git ~/repositories/duty-board
+   git clone -b deploy https://github.com/pribadi-school/dutyboard.git ~/repositories/dutyboard
    ```
 
    ```bash
-   cd ~/repositories/duty-board && bash deploy.sh
+   cd ~/repositories/dutyboard && bash deploy.sh
    ```
 
 7. **Admin password** — cPanel → Terminal (asks twice, not shown while typing;
    stores only a hash):
 
    ```bash
-   php ~/repositories/duty-board/tools/set-password.php
+   php ~/repositories/dutyboard/tools/set-password.php
    ```
 
 8. Open `https://duty.pribadidepok.sch.id/admin`, sign in, check the roster.
@@ -138,7 +138,7 @@ in.
 2. cPanel → Terminal:
 
    ```bash
-   cd ~/repositories/duty-board && git pull && bash deploy.sh
+   cd ~/repositories/dutyboard && git pull && bash deploy.sh
    ```
 
 A forgotten admin password: run step 7 again.

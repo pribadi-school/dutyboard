@@ -1,6 +1,6 @@
 # Every push to main: test, build and push the result to the `deploy` branch
 # (same as running `npm run deploy`). Then, to put it live, in
-# cPanel → Terminal: cd ~/repositories/duty-board && git pull && bash deploy.sh
+# cPanel → Terminal: cd ~/repositories/dutyboard && git pull && bash deploy.sh
 # No secrets are needed here: DB credentials live only in ~/duty-config.php on the server.
 name: Build for cPanel
 

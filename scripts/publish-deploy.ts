@@ -1,7 +1,7 @@
 /**
  * Builds the app and publishes it to the `deploy` branch on GitHub:
  * dist/ (index.html, assets, icons, .htaccess) + api/ + tools/ + sql/ + deploy.sh.
- * On the server (cPanel Terminal), ~/repositories/duty-board is a clone of
+ * On the server (cPanel Terminal), ~/repositories/dutyboard is a clone of
  * that branch; `git pull && bash deploy.sh` there copies the site files into
  * public_html/duty (tools/ and sql/ stay in the clone, outside the web root).
  * Run: npm run deploy (GitHub Actions runs it on every push to main).
@@ -12,7 +12,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const BRANCH = 'deploy';
-const SERVER_CMD = 'cd ~/repositories/duty-board && git pull && bash deploy.sh';
+const SERVER_CMD = 'cd ~/repositories/dutyboard && git pull && bash deploy.sh';
 
 // Runs on the server. Copies the site (not tools/, sql/ or this script) into
 // the subdomain's folder; old hashed assets are removed first.

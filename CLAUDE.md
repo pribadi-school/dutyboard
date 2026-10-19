@@ -72,7 +72,7 @@ databases only (fixed ids).
 cPanel (Niagahoster, user `pribadisch`), `duty.pribadidepok.sch.id` →
 `public_html/duty`. GitHub Actions builds `main` onto the generated `deploy`
 branch (`scripts/publish-deploy.ts`: dist + api + tools + sql + deploy.sh).
-Server: `cd ~/repositories/duty-board && git pull && bash deploy.sh`.
+Server: `cd ~/repositories/dutyboard && git pull && bash deploy.sh`.
 The `deploy` branch keeps linear history on purpose (plain `git pull` on the
 server fails on a force-push). `public/.htaccess` is the whitelist + SPA
 fallback; keep `api/[a-z]+.php` naming (helpers start with `_` and are denied).
