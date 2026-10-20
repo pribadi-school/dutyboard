@@ -54,7 +54,7 @@ export function WhoName({ who, className, subClassName, wrap }: { who: Who | nul
     <span className={cx('flex min-w-0 flex-col', className)}>
       <span className={cx('flex min-w-0 gap-[0.35em]', wrap ? 'items-start' : 'items-center')}>
         {who.group && <Users className={cx('size-[0.9em] shrink-0 text-muted-foreground', wrap && 'mt-[0.15em]')} aria-hidden />}
-        <span className={wrap ? 'line-clamp-2' : 'truncate'}>{whoText(who, lang)}</span>
+        <span className={wrap ? 'min-w-0 break-words' : 'truncate'}>{whoText(who, lang)}</span>
       </span>
       {who.override && (
         <span className={cx('mt-[0.2em] inline-flex items-center gap-[0.35em] self-start rounded-sm bg-accent-tint px-[0.45em] py-[0.15em] font-semibold text-foreground ring-1 ring-accent/30', subClassName ?? 'text-xs')}>

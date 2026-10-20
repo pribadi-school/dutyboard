@@ -5,7 +5,7 @@ and lets the office edit it in the browser.
 
 | Page | Who | What |
 |---|---|---|
-| `/` | Lobby TV (public) | “On duty now” cards, “Next up”, today's list (current row highlighted, past rows dimmed), WIB clock, QR to `/week`. Weekends and after the last duty: the next school day, with a label. |
+| `/` | Lobby TV (public) | “On duty now” cards, “Next up”, today's list (current row highlighted, past rows dimmed), WIB clock. Weekends and after the last duty: the next school day, with a label. |
 | `/week` | Teachers' phones (public) | The whole week like the PDF. Pick your name under **My duties** (remembered on the phone) to star your cells, including “All teachers” / “All male teachers”. Phones show one day at a time. |
 | `/print` | Office | The roster laid out like the printed PDF (A4 landscape) for the notice board. |
 | `/admin` | Office (password) | Edit the grid like a spreadsheet, **swap for one day** when a teacher is absent, teachers and groups, roster versions. |

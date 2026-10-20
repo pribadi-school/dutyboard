@@ -26,7 +26,7 @@ Colour is never the only cue: every status has an icon and a text label.
 
 ## 3. TV layout (1920×1080, read from across the lobby)
 
-- Full screen, no app header; logo, greeting, QR to `/week`, big WIB clock.
+- Full screen, no app header; logo, greeting, big WIB clock.
 - Text sized in `vh`; card text in container units (`cqh`/`cqw`) so it fits
   any TV or player app. Cards: one row of up to 6, then 6 × 2, then paging.
 - Today's list in three balanced columns, two lines per row (who; where).

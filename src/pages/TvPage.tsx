@@ -1,16 +1,14 @@
 /**
  * TV display for the school lobby (public, no sign-in), 1920×1080, readable
- * from across the room. Header with logo, greeting, date, big WIB clock and a
- * QR code to the week view; "On duty now" cards; "Next up"; today's full list
+ * from across the room. Header with logo, greeting, date and big WIB clock; "On duty now" cards; "Next up"; today's full list
  * by section (current rows highlighted, past rows dimmed).
  *
  * Weekends and after the last duty: shows the next school day, with a label.
  * Network down: keeps the last data with "Offline · last updated 07.12".
  * Phones/tablets get the normal app header and a stacked layout.
  */
-import { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, CalendarDays, Clock, Link2, MapPin, WifiOff } from 'lucide-react';
-import QRCode from 'qrcode';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { ArrowRight, CalendarDays, Clock, MapPin, WifiOff } from 'lucide-react';
 import { DutyPill, TimeLabel, WhoName, timeText } from '../components/duty';
 import { Header, SchoolLogo } from '../components/Header';
 import { Button, Card, Notice, Skeleton, cx } from '../components/ui';
@@ -87,13 +85,6 @@ export default function TvPage() {
   }, [pages]);
   const shownCards = current.slice((page % pages) * perPage, ((page % pages) + 1) * perPage);
 
-  // QR code to the week view on this same site (teachers open "my duties" on their phone).
-  const weekUrl = `${window.location.origin}/week`;
-  const [qr, setQr] = useState('');
-  useEffect(() => {
-    QRCode.toString(weekUrl, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: '#12233c', light: '#ffffff' } }).then(setQr);
-  }, [weekUrl]);
-
   const secondsNow = minutes * 60 + seconds;
   const left = (r: DayRow) => Math.max(1, Math.ceil((r.current!.end * 60 - secondsNow) / 60));
   const until = (start: number) => {
@@ -107,7 +98,7 @@ export default function TvPage() {
     <div className={cx('flex flex-col bg-surface-page', tv ? 'h-dvh overflow-hidden' : 'min-h-dvh')}>
       {!tv && <Header title={t('nav_tv')} />}
       <main className={cx('flex min-h-0 w-full flex-1 flex-col', tv ? 'gap-[1.8vh] px-[2vw] py-[2vh]' : 'gap-5 px-4 pt-6 pb-10')}>
-        {/* ---------- Header: logo, greeting, QR, clock ---------- */}
+        {/* ---------- Header: logo, greeting, clock ---------- */}
         <header className="flex flex-col gap-5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-x-[2vw] sm:gap-y-3">
           <div className={cx('flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-[1.5vw]', tv && 'min-w-0 flex-1')}>
             {tv && <SchoolLogo className="h-[clamp(36px,6vh,84px)]" />}
@@ -116,25 +107,6 @@ export default function TvPage() {
               <h1 className="text-[clamp(24px,4.2vh,56px)] leading-tight font-extrabold">{t(greeting(minutes))}</h1>
             </div>
           </div>
-          {tv && (
-            <div className="hidden shrink-0 items-center gap-[1vw] xl:flex">
-              {qr && (
-                <div
-                  className="aspect-square h-[clamp(72px,10vh,140px)] shrink-0 rounded-md bg-surface p-[0.5vh] [&_svg]:size-full"
-                  role="img"
-                  aria-label={`QR: ${weekUrl}`}
-                  dangerouslySetInnerHTML={{ __html: qr }}
-                />
-              )}
-              <div>
-                <p className="text-[clamp(13px,1.7vh,22px)] leading-tight text-muted-foreground">{t('tv_scan')}</p>
-                <p className="mt-[0.5vh] flex items-center gap-[0.3em] text-[clamp(13px,1.9vh,26px)] leading-none font-bold text-action">
-                  <Link2 className="size-[1em] shrink-0" aria-hidden />
-                  {window.location.host}/week
-                </p>
-              </div>
-            </div>
-          )}
           <div className="grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-2 border-t border-border-strong pt-4 sm:ml-auto sm:block sm:border-0 sm:pt-0 sm:text-right">
             <p className="flex shrink-0 items-center justify-end gap-2 text-[34px] leading-none font-extrabold tabular-nums sm:gap-3 sm:text-[clamp(28px,5.5vh,76px)]">
               <Clock className="size-[0.8em] text-action" aria-hidden />
@@ -187,7 +159,7 @@ export default function TvPage() {
             )}
 
             {/* ---------- On duty now + Next up ---------- */}
-            <section className={cx(tv ? 'grid min-h-0 flex-[0.8] grid-cols-[minmax(0,1fr)_minmax(0,22vw)] gap-[1.2vw]' : 'flex flex-col gap-5')} aria-label={t('tv_onDuty')}>
+            <section className={cx(tv ? cx('grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(0,22vw)] gap-[1.2vw]', banner ? 'flex-[0.6]' : 'flex-[0.8]') : 'flex flex-col gap-5')} aria-label={t('tv_onDuty')}>
               {current.length ? (
                 <ul
                   className={cx('grid', tv ? 'min-h-0 gap-[1.2vw]' : 'gap-4')}
@@ -220,7 +192,7 @@ export default function TvPage() {
                         />
                         <p className={cx('flex min-w-0 items-start gap-[0.3em] leading-snug font-semibold text-foreground', tv ? 'mt-[3cqh] text-[min(7cqh,8cqw)]' : 'mt-2 text-base')}>
                           <MapPin className="mt-[0.15em] size-[0.95em] shrink-0 text-action" aria-hidden />
-                          <span className={tv ? 'line-clamp-3' : undefined}>{r.duty.label}</span>
+                          <span>{r.duty.label}</span>
                         </p>
                         <p className={cx('flex items-center gap-[0.35em] border-t border-border-strong text-muted-foreground', tv ? 'mt-auto pt-[3cqh] text-[min(6cqh,7cqw)]' : 'mt-4 pt-3 text-sm')}>
                           <Clock className="size-[1em] shrink-0" aria-hidden />
@@ -249,20 +221,14 @@ export default function TvPage() {
                 </h2>
                 {next.length && nextStart !== undefined ? (
                   <>
-                    <p className="mt-[1vh] text-[clamp(28px,5.5vh,72px)] leading-none font-extrabold text-action tabular-nums">
-                      {next[0].duty.timing === 'approx' && '± '}
-                      {fmtMin(nextStart)}
+                    <p className="mt-[1vh] flex flex-wrap items-baseline gap-x-[0.8vw]">
+                      <span className="text-[clamp(28px,5.5vh,72px)] leading-none font-extrabold text-action tabular-nums">
+                        {next[0].duty.timing === 'approx' && '± '}
+                        {fmtMin(nextStart)}
+                      </span>
+                      {isToday && <span className="text-[clamp(14px,2vh,26px)] font-semibold text-muted-foreground">{until(nextStart)}</span>}
                     </p>
-                    {isToday && <p className="mt-[0.6vh] text-[clamp(14px,2vh,26px)] font-semibold text-muted-foreground">{until(nextStart)}</p>}
-                    <ul className="mt-[1.6vh] min-h-0 space-y-[1.2vh] overflow-hidden border-t border-border-strong pt-[1.4vh]">
-                      {next.slice(0, 3).map((r) => (
-                        <li key={r.duty.id} className="min-w-0">
-                          <WhoName who={r.who} className="text-[clamp(16px,2.5vh,32px)] leading-tight font-bold text-foreground" subClassName="text-[clamp(11px,1.5vh,20px)]" />
-                          <p className="truncate text-[clamp(13px,1.8vh,24px)] text-muted-foreground">{r.duty.label}</p>
-                        </li>
-                      ))}
-                      {next.length > 3 && <li className="text-[clamp(13px,1.8vh,24px)] font-semibold text-muted-foreground">+{next.length - 3}</li>}
-                    </ul>
+                    <NextList rows={next} tv={tv} />
                   </>
                 ) : (
                   <p className="mt-[1vh] text-[clamp(16px,2.4vh,32px)] text-muted-foreground">{t('tv_noMore')}</p>
@@ -326,10 +292,54 @@ function ListRow({ row: r, tv }: { row: DayRow; tv: boolean }) {
         )}
       </span>
       <span className="min-w-0">
-        <WhoName who={r.who} className={cx('leading-tight font-bold', r.state === 'past' ? 'text-muted-foreground' : 'text-foreground')} subClassName="text-[0.75em]" />
-        <span className="block truncate text-[0.85em] leading-snug text-muted-foreground">{r.duty.label}</span>
+        <WhoName who={r.who} wrap className={cx('leading-tight font-bold', r.state === 'past' ? 'text-muted-foreground' : 'text-foreground')} subClassName="text-[0.75em]" />
+        <span className="block text-[0.85em] leading-snug text-muted-foreground">{r.duty.label}</span>
       </span>
       <DutyPill state={r.state} className="text-[0.75em]" />
     </li>
+  );
+}
+
+/**
+ * "Next up" names: on the TV, only as many as fit completely in the card
+ * (names and places wrap, never cut off), then "+N more".
+ */
+function NextList({ rows, tv }: { rows: DayRow[]; tv: boolean }) {
+  const { t } = useI18n();
+  const ref = useRef<HTMLUListElement>(null);
+  const [shown, setShown] = useState(rows.length);
+  const key = rows.map((r) => r.duty.id).join();
+  // Start from all rows whenever they change, then drop the ones that don't fit.
+  useLayoutEffect(() => setShown(rows.length), [key, rows.length]);
+  useLayoutEffect(() => {
+    const ul = ref.current;
+    if (!tv || !ul) return;
+    const fit = () => {
+      const items = [...ul.querySelectorAll<HTMLElement>('li[data-row]')];
+      const more = ul.querySelector<HTMLElement>('li[data-more]');
+      const limit = ul.clientHeight - (shown < rows.length && more ? more.offsetHeight : 0);
+      const fits = items.filter((li) => li.offsetTop - ul.offsetTop + li.offsetHeight <= limit + 1).length;
+      if (fits < shown) setShown(fits);
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(ul);
+    return () => ro.disconnect();
+  }, [tv, shown, rows.length, key]);
+  const hidden = rows.length - shown;
+  return (
+    <ul ref={ref} className="mt-[1.6vh] min-h-0 flex-1 space-y-[1.2vh] overflow-hidden border-t border-border-strong pt-[1.4vh]">
+      {rows.slice(0, shown).map((r) => (
+        <li key={r.duty.id} data-row className="min-w-0">
+          <WhoName who={r.who} wrap className="text-[clamp(16px,2.5vh,32px)] leading-tight font-bold text-foreground" subClassName="text-[clamp(11px,1.5vh,20px)]" />
+          <p className="text-[clamp(13px,1.8vh,24px)] leading-snug text-muted-foreground">{r.duty.label}</p>
+        </li>
+      ))}
+      {hidden > 0 && (
+        <li data-more className="text-[clamp(13px,1.8vh,24px)] font-semibold text-muted-foreground">
+          {t('tv_more', { n: hidden })}
+        </li>
+      )}
+    </ul>
   );
 }

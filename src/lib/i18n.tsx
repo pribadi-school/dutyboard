@@ -64,12 +64,12 @@ const en = {
   tv_noneNow: 'No duty right now',
   tv_nextStarts: 'Next duty starts at {time}',
   tv_noMore: 'No more duties today',
+  tv_more: '+{n} more',
   tv_todayList: 'Today’s duties',
   tv_dayList: 'Duties for {day}',
   tv_weekend: 'Weekend: showing Monday’s duties',
   tv_afterHours: 'School day is over: showing the duties for {day}',
   tv_page: 'Page {p} of {n}',
-  tv_scan: 'My duties on your phone',
 
   // Week
   week_title: 'Duty roster',
@@ -279,12 +279,12 @@ const id: Record<MessageKey, string> = {
   tv_noneNow: 'Tidak ada piket saat ini',
   tv_nextStarts: 'Piket berikutnya mulai pukul {time}',
   tv_noMore: 'Tidak ada piket lagi hari ini',
+  tv_more: '+{n} lainnya',
   tv_todayList: 'Piket hari ini',
   tv_dayList: 'Piket hari {day}',
   tv_weekend: 'Akhir pekan: menampilkan piket hari Senin',
   tv_afterHours: 'Sekolah sudah usai: menampilkan piket hari {day}',
   tv_page: 'Halaman {p} dari {n}',
-  tv_scan: 'Jadwal piket saya di ponsel',
 
   week_title: 'Jadwal piket',
   week_lead: 'Jadwal satu minggu. Pilih nama Anda untuk melihat piket Anda sendiri.',
