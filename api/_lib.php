@@ -18,6 +18,13 @@ header('Referrer-Policy: same-origin');
 
 set_exception_handler(function (Throwable $e): void {
     error_log('[duty-board] ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine());
+    // Command-line tools (tools/*.php): show the real error, not JSON.
+    if (PHP_SAPI === 'cli') {
+        fwrite(STDERR, "
+Error: " . $e->getMessage() . "
+");
+        exit(1);
+    }
     // Constraint violations (unknown teacher id, duplicate name, …) are bad input, not a crash.
     if ($e instanceof PDOException && ($e->errorInfo[0] ?? '') === '23000') {
         $dup = ($e->errorInfo[1] ?? 0) === 1062;
@@ -80,6 +87,12 @@ function out(array $data, int $status = 200): never
 
 function fail(string $code, int $status = 400): never
 {
+    if (PHP_SAPI === 'cli') {
+        fwrite(STDERR, "
+Error: $code" . ($code === 'NOT_CONFIGURED' ? ' (~/duty-config.php not found or not readable)' : '') . "
+");
+        exit(1);
+    }
     out(['error' => $code], $status);
 }
 
