@@ -22,7 +22,7 @@ export function save(key: string, value: unknown) {
 
 export const KEYS = {
   lang: 'duty.lang',
-  /** "My duties": the teacher picked on /week. */
+  /** "My duties": the teacher picked on the week page. */
   me: 'duty.me',
   adminSession: 'duty.demo.adminSession',
   demoDb: 'duty.demo.v1',

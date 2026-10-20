@@ -11,8 +11,8 @@ import { useI18n, type MessageKey } from '../lib/i18n';
 import { cx } from './ui';
 
 const LINKS: { to: string; label: MessageKey; icon: typeof Tv; group: 'teachers' | 'staff' }[] = [
-  { to: '/week', label: 'nav_week', icon: CalendarDays, group: 'teachers' },
-  { to: '/', label: 'nav_tv', icon: Tv, group: 'teachers' },
+  { to: '/', label: 'nav_week', icon: CalendarDays, group: 'teachers' },
+  { to: '/board', label: 'nav_tv', icon: Tv, group: 'teachers' },
   { to: '/print', label: 'nav_print', icon: Printer, group: 'staff' },
   { to: '/admin', label: 'nav_admin', icon: ShieldCheck, group: 'staff' },
 ];
@@ -48,7 +48,7 @@ export function NavMenu() {
     };
   }, [open]);
 
-  const isCurrent = (to: string) => (to === '/' ? pathname === '/' : pathname.startsWith(to));
+  const isCurrent = (to: string) => (to === '/' ? pathname === '/' || pathname === '/week' : pathname.startsWith(to));
 
   return (
     <div ref={root} className="relative">

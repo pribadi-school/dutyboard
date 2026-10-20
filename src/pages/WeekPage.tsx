@@ -1,5 +1,5 @@
 /**
- * /week — the whole week, for teachers' phones. Pick your name under "My
+ * / (and /week) — the whole week, for teachers' phones. Pick your name under "My
  * duties" (remembered on this device) to highlight your cells, including
  * groups that cover you ("All teachers", "All male teachers").
  * Tablet/desktop: a grid like the printed PDF. Phones: one day at a time.

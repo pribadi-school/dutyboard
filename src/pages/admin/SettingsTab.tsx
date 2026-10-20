@@ -30,8 +30,8 @@ export function SettingsTab() {
   };
   const origin = window.location.origin;
   const links = [
-    { href: '/', label: t('nav_tv'), icon: Tv },
-    { href: '/week', label: t('nav_week'), icon: CalendarDays },
+    { href: '/', label: t('nav_week'), icon: CalendarDays },
+    { href: '/board', label: t('nav_tv'), icon: Tv },
     { href: '/print', label: t('nav_print'), icon: Printer },
   ];
   return (

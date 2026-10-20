@@ -1,7 +1,7 @@
 # Teachers on Duty — project notes
 
-Duty roster board for SD Pribadi Depok: lobby TV (`/`), week view for
-teachers' phones (`/week`), print view (`/print`), admin editor (`/admin`).
+Duty roster board for SD Pribadi Depok: week view for teachers' phones
+(`/`, also `/week`), lobby TV (`/board`), print view (`/print`), admin editor (`/admin`).
 README.md is the user-facing guide (data model, setup, deploy) — read it
 first; this file is what's easy to get wrong while changing the code.
 
@@ -26,7 +26,7 @@ where they differ.
   (Now / Next / Done); a swap shows the orange “Substitute for …” badge.
 - Respect `prefers-reduced-motion` (motion disabled, not shortened).
 - TV text is sized in `vh` / container units (`cqh`/`cqw`) so it fits 1920×1080
-  without scrolling; check `/` at 1920×1080 after layout changes, using `?now=`.
+  without scrolling; check `/board` at 1920×1080 after layout changes, using `?now=`.
 
 ## Two backends, one contract
 
@@ -93,4 +93,4 @@ fallback; keep `api/[a-z]+.php` naming (helpers start with `_` and are denied).
   Indonesia (TypeScript enforces matching keys). Roster content is data.
 - Times are WIB, shown `06.45`, whatever the device timezone: use
   `src/lib/time.ts`. `?now=07:20` simulates a time for checking screens.
-- Teachers open `/week` on phones: check changes at 360 px wide.
+- Teachers open `/` on phones: check changes at 360 px wide.
