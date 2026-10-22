@@ -52,6 +52,7 @@ function config(): array
     if (!$path || !is_readable($path)) fail('NOT_CONFIGURED', 500);
     $cfg = require $path;
     if (!is_array($cfg)) fail('NOT_CONFIGURED', 500);
+    $cfg['_dir'] = dirname($path);
     return $cfg;
 }
 
@@ -107,6 +108,7 @@ function body(): array
     $raw = file_get_contents('php://input', false, null, 0, 65536);
     $data = json_decode($raw ?: '{}', true);
     if (!is_array($data)) fail('INVALID_INPUT');
+    $GLOBALS['duty_body'] = $data;
     return $data;
 }
 
@@ -133,6 +135,14 @@ function start_session(): void
     session_name('duty_admin');
     session_set_cookie_params(['lifetime' => 0, 'path' => '/', 'secure' => $https, 'httponly' => true, 'samesite' => 'Strict']);
     ini_set('session.use_strict_mode', '1');
+    // Shared hosts keep sessions in a common temp folder that other sites'
+    // cleanup wipes after ~24 minutes ("session has ended"). Keep ours in a
+    // private folder next to duty-config.php, outside the web root.
+    $dir = (config()['_dir'] ?? '') . '/duty-sessions';
+    if ((is_dir($dir) || @mkdir($dir, 0700)) && is_writable($dir)) {
+        session_save_path($dir);
+        ini_set('session.gc_maxlifetime', (string) (SESSION_IDLE + 3600));
+    }
     session_start();
     if (!empty($_SESSION['admin']) && time() - (int) ($_SESSION['last'] ?? 0) > SESSION_IDLE) {
         $_SESSION = [];
@@ -149,7 +159,8 @@ function is_admin(): bool
 function require_admin(): void
 {
     if (!is_admin()) fail('NOT_SIGNED_IN', 401);
-    $sent = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+    // Header first; the request body's _csrf is a fallback for servers that drop custom headers.
+    $sent = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ($GLOBALS['duty_body']['_csrf'] ?? '');
     if (!is_string($sent) || !hash_equals((string) ($_SESSION['csrf'] ?? ''), $sent)) fail('CSRF', 403);
     $_SESSION['last'] = time();
 }

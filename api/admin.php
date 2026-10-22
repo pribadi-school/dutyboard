@@ -8,9 +8,8 @@
 declare(strict_types=1);
 require __DIR__ . '/_lib.php';
 require_method('POST');
-require_admin();
-
 $in = body();
+require_admin();
 $action = is_string($in['action'] ?? null) ? $in['action'] : '';
 
 /** Rewrite sort = 1..n for a list of ids in their new order. */
