@@ -49,6 +49,6 @@ export function createPhpApi(): Api {
       await post('logout.php', {});
       csrf = null;
     },
-    admin: (a: AdminAction) => post<AdminResult>('admin.php', a),
+    admin: (a: AdminAction) => post<AdminResult>('admin.php', { ...a, _csrf: csrf }),
   };
 }
